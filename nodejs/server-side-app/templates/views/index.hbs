@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <title>Node HTML file onto the browser</title>
+    <link rel='stylesheet' href="./css/styles.css" />
+    
+</head>
+
+<body>
+    {{>header}}
+    <h1>{{title}}</h1>
+    <input type="text" id='txtword' />
+    <button onclick="fetchDefination()">Search</button>
+    <div>
+        <div id='h3word'></div>
+        <div id='h3defination'></div>
+    </div>
+    <h3>Created by : {{createdBy}}</h3>
+    {{>footer}}
+    <script src='./js/index.js'></script>
+</body>
+
+</html>
