@@ -17,7 +17,7 @@ const Profiles = mongoose.model('Profiles',{
     },
     graduate:{
         type:Boolean,
-        required:true
+        default:false
     },
     email:{
         type:String,
