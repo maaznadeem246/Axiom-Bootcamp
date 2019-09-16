@@ -21,6 +21,11 @@ const profileRoutes = require('./routers/profile-routes')
 const app = express()
 
 const port = process.env.PORT || 3000
+
+// app.use((req,res,next)=>{
+//     res.send("sorry site is under maintainence !! ,try again later")
+// })
+
 app.use(express.json())
 app.use(profileRoutes)
 
