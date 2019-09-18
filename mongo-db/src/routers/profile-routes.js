@@ -22,12 +22,14 @@ routes.post('/profiles', async (req, res) => {
 
 routes.get('/profiles',async(req,res) => {
 try {
-   const profile = await Profiles.find({})
-    if (!profile) {
+   const profiles = await Profiles.find({})
+    if (!profiles) {
         res.status(404)
     }
-   res.send(profile)
+    //const publicDataProfiles = Profiles.sendPublicDataOnly(profiles)
+   res.send(profiles)
 }catch(e){
+    console.log(e)
     res.status(500)
     res.send(e)    
 }
@@ -38,7 +40,11 @@ routes.get('/profiles/myprofile',auth,async (req,res)=>{
     // const id = req.params.id
     try{
     //const profile = await Profiles.findById(id)
-      const profile = req.profile
+    
+    const profile = req.profile
+     await profile.populate('wishList').execPopulate()
+
+
    //     console.log(profile._id.toString(), ' ', id)  
     // if (profile._id.toString() !== id ) {
     //         res.status(404).send({})
@@ -46,6 +52,7 @@ routes.get('/profiles/myprofile',auth,async (req,res)=>{
         res.send(profile)
     }
     catch(e){
+       // console.log(e)
         res.status(500).send(e)
     }
 
@@ -70,7 +77,7 @@ routes.patch('/profiles/myprofile', auth, async (req, res) => {
         profile = req.profile
          Object.assign(profile,changedProfile)
         await profile.save()
-        console.log(changedProfile)
+      //  console.log(changedProfile)
         res.send(profile)
         
     }catch(e){
@@ -85,7 +92,7 @@ routes.delete('/profiles/myprofile',auth, async (req,res) => {
     // if(!profile){
     //     res.status(404)
     // }
-
+    //await req.profile.populate('wishList').execPopulate()
     await req.profile.remove()
     res.send(req.profile)
     }catch(e){
@@ -98,7 +105,7 @@ routes.post('/profiles/login',async(req, res) => {
     try{
         const profile = await Profiles.findByCredentials(req.body.email, req.body.password)
         const token = await profile.generateAuthToken()
-
+        //const publicData = profile.sendPublicDataOnly()
         res.send({profile, token})
     }catch(e){
         console.log(e)

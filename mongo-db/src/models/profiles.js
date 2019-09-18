@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcryptjs = require('bcryptjs')
 var jwt = require('jsonwebtoken');
-
+const WishList = require('./wishlist')
 
 // const Profiles = mongoose.model('Profiles',{
 //     name:{
@@ -91,9 +91,16 @@ const profileSchema = mongoose.Schema({
             required:true
         }
     }]
+},{ 
+    toObject: { virtuals: true },
+    timestamps:true
 })
 
-
+profileSchema.virtual('wishList',{
+    ref:'WishList',
+    localField:'_id',
+    foreignField: 'wishedBy'
+})
 
 
 profileSchema.pre('save',async function(next){
@@ -107,6 +114,13 @@ profileSchema.pre('save',async function(next){
      next()
 })
 
+profileSchema.pre('remove', async function (next) {
+    const profile = this
+    await WishList.deleteMany({
+        wishedBy:profile._id
+    })
+    next()
+})
 
 profileSchema.statics.findByCredentials = async (email, password) => {
     const profile = await Profiles.findOne({email})
@@ -130,6 +144,33 @@ profileSchema.methods.generateAuthToken = async function(){
     await profile.save()
     return token
 }
+
+
+// we can use to toJSON function 
+// profileSchema.methods.toJSON , profileSchema.statics.toJSON
+// which overriddes its built-in function and do our functionality
+profileSchema.methods.toJSON = function () {
+    const profile = this
+    const publicProfileData = profile.toObject()
+
+    delete publicProfileData.password
+    delete publicProfileData.tokens
+
+    //console.log(publicProfileData)
+    return publicProfileData
+}
+
+profileSchema.statics.toJSON = function (records) {
+    const profiles = records
+    const publicProfileFields = profiles.map((p => {
+        const obj = p.toObject()
+        delete obj.password
+        delete obj.tokens
+        return obj
+    }))
+    return publicProfileFields
+}
+
     
 
 const Profiles = mongoose.model('Profiles', profileSchema)
