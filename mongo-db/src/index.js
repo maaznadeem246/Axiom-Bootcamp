@@ -21,7 +21,7 @@ const wishlistRoutes = require('./routers/wishlist-routes')
 
 const app = express()
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 // app.use((req,res,next)=>{
 //     res.send("sorry site is under maintainence !! ,try again later")

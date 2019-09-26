@@ -90,7 +90,10 @@ const profileSchema = mongoose.Schema({
            type: String,
             required:true
         }
-    }]
+    }],
+    avatar:{
+        type:Buffer
+    }
 },{ 
     toObject: { virtuals: true },
     timestamps:true
@@ -139,7 +142,7 @@ profileSchema.statics.findByCredentials = async (email, password) => {
 
 profileSchema.methods.generateAuthToken = async function(){
     const profile = this
-    const token = jwt.sign({_id:profile._id.toString()}, 'thisIsMySecretKey')
+    const token = jwt.sign({ _id: profile._id.toString() }, process.env.JWT_SECRET)
     profile.tokens = profile.tokens.concat({token:token})
     await profile.save()
     return token
@@ -155,6 +158,7 @@ profileSchema.methods.toJSON = function () {
 
     delete publicProfileData.password
     delete publicProfileData.tokens
+    delete publicProfileData.avatar
 
     //console.log(publicProfileData)
     return publicProfileData
@@ -166,6 +170,7 @@ profileSchema.statics.toJSON = function (records) {
         const obj = p.toObject()
         delete obj.password
         delete obj.tokens
+        delete obj.avatar
         return obj
     }))
     return publicProfileFields
